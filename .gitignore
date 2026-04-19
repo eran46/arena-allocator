@@ -1,0 +1,4 @@
+build/*
+scripts/*
+Testing/*
+compile_commands.json
