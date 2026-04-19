@@ -20,7 +20,6 @@ FetchContent_MakeAvailable(googletest)
 
 SET(ARENA_CCFILES
     src/arena_alloc.cc
-    src/gtest.cc
     )
 
 # 3. Add your actual application/library code
@@ -31,6 +30,7 @@ target_include_directories(arenalib PUBLIC include)
 
 SET(ARENA_GTEST_CCFILES
     tests/test_arena_alloc.cc
+    tests/gtest_main.cc
     )
 
 # 4. Create the Test Executable
