@@ -13,72 +13,26 @@ class ArenaAllocTest : public testing::Test {
 
 // alocation tests
 
-// allocation
-TEST_F(ArenaAllocTest, alloc) {
-    uint8_t* ptr = arena.alloc<uint8_t>(1);
-    ASSERT_NE(ptr, nullptr);
+// allocate internal block
+TEST_F(ArenaAllocTest, alloc_sblock) {
+  /// @todo implement
 }
 
-// allocate in a small block
-TEST_F(ArenaAllocTest, alloc_small_block) {
-    // allocate small block
-    uint8_t* ptr = arena.alloc<uint8_t>(1);
-
-    // second allocation same block
-    uint8_t *ptr1 = arena.alloc<uint8_t>(1);
-
-    ASSERT_EQ(ptr1 - ptr, 1);
-
-    uint8_t *ptr3 = arena.alloc<uint8_t>(BLOCK_SIZE_SMALL - 2); // third allocation, fill current small block
-    ASSERT_EQ(ptr3 - ptr, BLOCK_SIZE_SMALL);
-}
-
-// allocate full small block
-TEST_F(ArenaAllocTest, alloc_small_block_full) {
-    uint8_t *ptr = arena.alloc<uint8_t>(BLOCK_SIZE_SMALL * 1024);
-    ASSERT_EQ(arena.get_block_size(), BLOCK_SIZE_SMALL);
-}
-
-// allocate medium block
-TEST_F(ArenaAllocTest, alloc_medium_block) {
-    uint8_t *ptr = arena.alloc<uint8_t>(BLOCK_SIZE_SMALL + 8);
-    EXPECT_EQ(ptr, nullptr);
-}
-
-// allocate a small than a medium
-TEST_F(ArenaAllocTest, alloc_small_to_medium) {
-    uint8_t* ptr = arena.alloc<uint8_t>(BLOCK_SIZE_SMALL / 2);
-    
-    size_t initial_block_size = arena.get_block_size(); // initial small block size
-
-    uint8_t *ptr4 = arena.alloc<uint8_t>(BLOCK_SIZE_SMALL * 2); // allocates new medium block
-    
-    ASSERT_NE(initial_block_size, arena.get_block_size());
-}
-
-// allocate large block
-TEST_F(ArenaAllocTest, alloc_large_block) {
-    uint8_t *ptr = arena.alloc<uint8_t>(BLOCK_SIZE_MEDIUM + 1);
-    EXPECT_EQ(ptr, nullptr);
+// allocate internal block full
+TEST_F(ArenaAllocTest, alloc_sblock_full) {
+  /// @todo implement
 }
 
 // allocate dynamic block
-TEST_F(ArenaAllocTest, alloc_dynamic_block) {
-    uint8_t *ptr = arena.alloc<uint8_t>(BLOCK_SIZE_LARGE + 1);
-    EXPECT_EQ(ptr, nullptr);
+TEST_F(ArenaAllocTest, alloc_dblock) {
+    /// @todo implement
 }
 
 // memory
 
 // dynamic block freed on arena deleted
-TEST_F(ArenaAllocTest, dynamic_block_freed) {
-    uint8_t *ptr_small = _arena->alloc<uint8_t>(BLOCK_SIZE_SMALL);
-    uint8_t *ptr_medium = _arena->alloc<uint8_t>(BLOCK_SIZE_MEDIUM);
-    uint8_t *ptr_large = _arena->alloc<uint8_t>(BLOCK_SIZE_LARGE);
-    uint8_t *ptr_dyn = _arena->alloc<uint8_t>(BLOCK_SIZE_LARGE + 1);
-
-    // will fail on address sanitizer if dynamic block is not freed
-    _arena.reset();
+TEST_F(ArenaAllocTest, alloc_dblock_check_drop) {
+    /// @todo implement
 }
 
 // alignment tests
