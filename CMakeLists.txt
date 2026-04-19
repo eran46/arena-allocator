@@ -41,3 +41,12 @@ target_link_libraries(run_tests GTest::gtest_main arenalib)
 # 5. Integrate with VS Code / CTest
 include(GoogleTest)
 gtest_discover_tests(run_tests)
+
+target_compile_options(run_tests PRIVATE 
+    -fsanitize=address
+    -fno-omit-frame-pointer
+    -g
+)
+
+# 2. Add the flags for linking (THIS IS WHAT IS MISSING)
+target_link_options(run_tests PRIVATE -fsanitize=address)

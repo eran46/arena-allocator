@@ -49,9 +49,14 @@ class ArenaAlloc {
         remaining_bytes -= static_cast<char *>(temp) - static_cast<char *>(block_ptr);
         block_ptr = temp; // update block_ptr
 
-        // not enough room for allocation in current block
         if (remaining_bytes < alloc_size) {
+          // not enough room for allocation in current block
+          if (alloc_size > next_dblock_size) {
+            // next dynamic block size is also too small, allocate custom sized block
+            alloc_block_custom(alloc_size);
+          } else {
             alloc_block(); // this updates remaining_bytes and block_ptr
+          }
         }
 
         // save current block_ptr for result
@@ -65,6 +70,8 @@ class ArenaAlloc {
     
     // returns current block's blocksize, 0 on no blocks
     size_t get_block_size();
+
+    void drop();
 
   private:
     void alloc_block();
