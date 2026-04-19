@@ -15,24 +15,34 @@ class ArenaAllocTest : public testing::Test {
 
 // allocate internal block
 TEST_F(ArenaAllocTest, alloc_sblock) {
-  /// @todo implement
-}
-
-// allocate internal block full
-TEST_F(ArenaAllocTest, alloc_sblock_full) {
-  /// @todo implement
+  uint8_t *ptr_byte1 = arena.alloc<uint8_t>(1);
+  ASSERT_NE(ptr_byte1, nullptr);
 }
 
 // allocate dynamic block
 TEST_F(ArenaAllocTest, alloc_dblock) {
-    /// @todo implement
+    // fill static internal array
+    uint8_t *ptr_byte1 = arena.alloc<uint8_t>(STATIC_MEMORY_SIZE);
+    // alocate dynamic block
+    uint8_t *ptr_byte2 = arena.alloc<uint8_t>(STATIC_MEMORY_SIZE);
+
+    // check memory not contiguous
+    ASSERT_NE(ptr_byte1 + STATIC_MEMORY_SIZE, ptr_byte2);
 }
 
 // memory
 
 // dynamic block freed on arena deleted
 TEST_F(ArenaAllocTest, alloc_dblock_check_drop) {
-    /// @todo implement
+    // fill static internal array
+    uint8_t *ptr_byte1 = arena.alloc<uint8_t>(STATIC_MEMORY_SIZE);
+    
+    // custom allocation of dynamic block
+    uint8_t *ptr_byte2 = arena.alloc<uint8_t>(10 * STATIC_MEMORY_SIZE);
+
+    uint8_t *ptr_byte3 = arena.alloc<uint8_t>(STATIC_MEMORY_SIZE);
+
+    arena.drop();
 }
 
 // alignment tests

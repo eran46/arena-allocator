@@ -9,6 +9,15 @@ ArenaAlloc::ArenaAlloc() {
 
 ArenaAlloc::~ArenaAlloc(){}
 
+void ArenaAlloc::drop() {
+    // free all dynamic blocks
+    d_blocks.clear();
+
+    // reset to start of internal array
+    block_ptr = s_block;
+    remaining_bytes = STATIC_MEMORY_SIZE;
+}
+
 void ArenaAlloc::alloc_block() {
     
     // allocation size in KB
