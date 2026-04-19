@@ -1,33 +1,10 @@
-/**
- * Arena Allocator
- * Allocates large slab of memory upfront, hand out pieces of it by moving a pointer forward
- * (only).
- *      - Manages objects of any size
- *      - Can not free individual objects, only the whole arena
- *
- * Compiler builds AST -> CFG (?) -> IR, and don't need the previous phase once it is over.
- * 
- * Implementation Notes:
- * 1. Define a constant block size
- * 2. Implement a Block struct representing a single chunk of memory
- *    Will hold ptr to block, and how many bytes remain.
- * 3. Implement Arena class which maintains a list of blocks and an allocate method
- *    Allocate method returns the pointer to current block or allocates a new block and returns a
- *    new pointer to it.
- * 4. Extra - cache locality implementation? think about it
- * 5. We will implement a static 10 block option followed by additional dynamic memory allocation
- *    if necessary.
- */
-
 #include <cstddef>
 #include <vector>
 #include <memory>
 
 #include "block.h"
 
-using SmallBlock = StaticBlock<BLOCK_SIZE_SMALL>;
-using MediumBlock = StaticBlock<BLOCK_SIZE_MEDIUM>;
-using LargeBlock = StaticBlock<BLOCK_SIZE_LARGE>;
+#define STATIC_MEMORY_SIZE 4096
 
 // Arena Allocator
 class ArenaAlloc {
@@ -45,18 +22,60 @@ class ArenaAlloc {
     ArenaAlloc();
     ~ArenaAlloc();
 
+    /**
+    * @param size number of objects of type T to allocate
+    * @return pointer to memory
+    * allocates additional blocks if necessary, maintains allignment of T
+    * size allocated must be smaller than block size
+    */
     template <typename T>
-    T *alloc(size_t size, size_t a = alignof(T)); // alignof returns alignment of type
+    T* alloc(size_t size, size_t a = alignof(T)){
+        void *temp;
+        const size_t type_size = sizeof(T);
+        const size_t alloc_size = size * type_size; // in bytes
 
+        // check if allocating more than block size, and valid size
+        // this does not allow 0 bytes to be requested
+        if (size <= 0){
+            return nullptr;
+        }
+
+        // the allocation request is valid
+        
+        // maintain alignment
+        temp = std::align(a, type_size, block_ptr, remaining_bytes);
+
+        // subtract bytes skipped from remaining bytes
+        remaining_bytes -= static_cast<char *>(temp) - static_cast<char *>(block_ptr);
+        block_ptr = temp; // update block_ptr
+
+        // not enough room for allocation in current block
+        if (remaining_bytes < alloc_size) {
+            alloc_block(); // this updates remaining_bytes and block_ptr
+        }
+
+        // save current block_ptr for result
+        temp = block_ptr;
+        block_ptr = static_cast<char*>(block_ptr) + alloc_size;
+        remaining_bytes -= alloc_size;
+        
+        // launder pointer
+        return std::launder(reinterpret_cast<T*>(temp));
+    }
+    
     // returns current block's blocksize, 0 on no blocks
     size_t get_block_size();
-    
-  private:
-    void alloc_block(size_t alloc_size);
-        
-    // Block* static_blocks[num_static_blocks];
-    std::vector<std::unique_ptr<IBlock>> _blocks;
 
+  private:
+    void alloc_block();
+    
+    void alloc_block_custom(size_t alloc_size);
+        
+    std::vector<std::unique_ptr<IBlock>> d_blocks;
+    uint8_t s_block[STATIC_MEMORY_SIZE];
+
+    int next_dblock_size;
+    
     size_t remaining_bytes;
     void* block_ptr;
 

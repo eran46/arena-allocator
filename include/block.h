@@ -2,10 +2,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#define BLOCK_SIZE_SMALL 4 // 4 KB
-#define BLOCK_SIZE_MEDIUM 64 // 64 KB
-#define BLOCK_SIZE_LARGE 1024 // 1 MB
-
 // Generic Interface Block
 struct IBlock {
     IBlock(){}
